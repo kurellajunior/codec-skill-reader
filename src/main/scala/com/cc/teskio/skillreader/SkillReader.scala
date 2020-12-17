@@ -1,5 +1,6 @@
 package com.cc.teskio.skillreader
 
+import com.cc.teskio.skillstore.SkillStoreController
 import com.typesafe.scalalogging.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -7,18 +8,22 @@ import org.springframework.stereotype.Service
 import play.api.libs.json.{JsArray, JsObject, Json}
 import scalaj.http.Http
 
+import javax.annotation.PostConstruct
 import scala.util.{Success, Try}
 
 @Service
 @Autowired
-class SkillReader() {
+class SkillReader(skillStore: SkillStoreController) {
 
   val LOG: Logger = Logger[SkillReader]
+  @PostConstruct
+  def initialize(): Unit = fetchAndPublish()
 
   @Scheduled(fixedDelayString = "3600000")
   def fetchAndPublish(): Unit = {
-    val skillsets = getUserIds // Seq("user-id")
+    getUserIds // Seq("user-id")
       .flatMap(loadAllSkills) // Seq("user-id"-> Seq("skill"))
+      .map(_.foreach({case (login, skills)⇒ skillStore.addSkills("github", login, skills.toSet)}))
   }
 
   private def getUserIds: Try[Seq[String]] = {

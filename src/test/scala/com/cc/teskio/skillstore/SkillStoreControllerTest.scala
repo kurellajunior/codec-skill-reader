@@ -36,4 +36,12 @@ class SkillStoreControllerTest extends FunSuite with Matchers{
     storeController.addSkills("github", "jku", Set("java"))
     storeController.getResponse("jku") shouldEqual("""{"id":"jku","skills":["java"]}""")
   }
+
+  test("testGetSkillsMultiple") {
+    val storeController = new SkillStoreController
+    storeController.getResponse("jku") shouldEqual("""{"id":"jku","skills":[]}""")
+    storeController.addSkills("github", "jku", Set("java"))
+    storeController.addSkills("so", "jku", Set("scala"))
+    storeController.getResponse("jku") shouldEqual("""{"id":"jku","skills":["java","scala"]}""")
+  }
 }

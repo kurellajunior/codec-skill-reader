@@ -22,7 +22,7 @@ class SkillStoreController {
   def getResponse(id:String): String = {
     val skills = skillStore.filter((x) ⇒ {x._2.keySet.contains(id)})
       .foldLeft(Set[String]())((target, entry) ⇒ target ++ entry._2(id))
-    Json.stringify(Json.obj("id" → id, "skills" → skills))
+    Json.stringify(Json.obj("id" → id, "skills" → skills.toList.sorted))
   }
 
   /** this will be later callled from the POST controller, once this is a single service */
